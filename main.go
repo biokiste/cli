@@ -80,6 +80,7 @@ func main() {
 	defer results.Close()
 
 	var users []UserDeprecated
+	var newUsers []User
 	for results.Next() {
 		var user UserDeprecated
 		err = results.Scan(
@@ -116,24 +117,37 @@ func main() {
 		users = append(users, user)
 	}
 	for _, usr := range users {
-		oldID := usr.ID
+
+		var state string
+		if usr.State == 2 {
+			state = "active"
+		}
 		newUser := User{
-			FirstName: usr.Firstname,
-			LastName:  usr.Lastname,
-			Email:     usr.Email,
-			Phone:     usr.Mobile,
-			Street:    usr.Street,
-			// StreetNumber: usr.Street, // TODO: split Street to get Number ?
-			Zip:             usr.ZIP,
-			Birthday:        usr.DateOfBirth,
-			EntranceDate:    usr.DateOfEntry,
-			LeavingDate:     usr.DateOfExit,
+			ID:           usr.ID,
+			FirstName:    usr.Firstname,
+			LastName:     usr.Lastname,
+			Email:        usr.Email,
+			Phone:        usr.Mobile,
+			Street:       usr.Street,
+			StreetNumber: "0815", // TODO: split Street to get Number ?
+			Zip:          usr.ZIP,
+			Country:      "Germany",
+			Birthday:     usr.DateOfBirth,
+			EntranceDate: usr.DateOfEntry,
+			// LeavingDate:     usr.DateOfExit,
 			AdditionalInfos: usr.Comment,
 			LastActivityAt:  usr.LastLogin,
 			CreatedAt:       usr.CreatedAt,
 			UpdatedAt:       usr.UpdatedAt,
+			CreatedBy:       174,
+			Password:        "2020_b!ok!ste_2020",
+			State:           state,
 		}
 
-		fmt.Println(oldID, newUser)
+		newUsers = append(newUsers, newUser)
 	}
+	addUser := newUsers[143]
+	id, err := AddUserReq(addUser)
+
+	fmt.Println(id)
 }

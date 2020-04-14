@@ -55,4 +55,5 @@ type User struct {
 	UpdatedAt       string `json:"updatedAt,omitempty"`
 	UpdatedBy       int    `json:"updatedBy,omitempty"`
 	UpdateComment   string `json:"updateComment,omitempty"`
+	Password        string `json:"password"`
 }
