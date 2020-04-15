@@ -7,20 +7,56 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/spf13/viper"
 )
 
-type userCreationResponse struct {
-	ID string `json:"id"`
+func prepareUser(users []UserDeprecated) []User {
+	var newUsers []User
+	for _, usr := range users {
+		userMobile := strings.ReplaceAll(usr.Mobile, " ", "")
+		fmt.Println(usr.Mobile, userMobile)
+		var state string
+		if usr.State == 2 {
+			state = "active"
+		}
+		newUser := User{
+			FirstName:       usr.Firstname,
+			LastName:        usr.Lastname,
+			Email:           usr.Email,
+			Phone:           userMobile,
+			Street:          usr.Street,
+			StreetNumber:    "0815", // TODO: split Street to get Number ?
+			Zip:             usr.ZIP,
+			Country:         "Germany",
+			Birthday:        usr.DateOfBirth,
+			EntranceDate:    usr.DateOfEntry,
+			AdditionalInfos: strconv.Itoa(usr.ID), // save oldID for further transaction inserts
+			LastActivityAt:  usr.LastLogin,
+			CreatedAt:       usr.CreatedAt,
+			UpdatedAt:       usr.UpdatedAt,
+			CreatedBy:       174,
+			Password:        "2020_b!ok!ste_" + userMobile, // initial password
+			State:           state,
+		}
+
+		newUsers = append(newUsers, newUser)
+	}
+	return newUsers
+
 }
 
 // AddUserReq sends user creation
-func AddUserReq(user User) (string, error) {
+func AddUserReq(users []UserDeprecated) error {
+	newUsers := prepareUser(users)
+	addUser := newUsers[143]
+
 	token := viper.GetString("token")
 	apiBaseURL := viper.GetString("api_base_url")
 
-	reqBody, err := json.Marshal(user)
+	reqBody, err := json.Marshal(addUser)
 	if err != nil {
 		print(err)
 	}
@@ -40,15 +76,9 @@ func AddUserReq(user User) (string, error) {
 
 	if resp.StatusCode != 200 {
 		fmt.Println(resp.StatusCode, string(body))
-		return string(body), errors.New(string(resp.StatusCode))
+		return errors.New(string(resp.StatusCode))
 	}
 
-	var u userCreationResponse
-	json.NewDecoder(resp.Body).Decode(&u)
-
-	// TODO: id should be assign
 	fmt.Println("resp ", string(body))
-	fmt.Println("user ", u)
-
-	return u.ID, nil
+	return nil
 }
