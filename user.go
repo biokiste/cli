@@ -17,10 +17,15 @@ func prepareUser(users []UserDeprecated) []User {
 	var newUsers []User
 	for _, usr := range users {
 		userMobile := strings.ReplaceAll(usr.Mobile, " ", "")
-		fmt.Println(usr.Mobile, userMobile)
+
 		var state string
 		if usr.State == 2 {
 			state = "active"
+		}
+
+		var birthday string
+		if usr.DateOfBirth == "0000-00-00" {
+			birthday = "2222-12-12"
 		}
 		newUser := User{
 			FirstName:       usr.Firstname,
@@ -31,7 +36,7 @@ func prepareUser(users []UserDeprecated) []User {
 			StreetNumber:    "0815", // TODO: split Street to get Number ?
 			Zip:             usr.ZIP,
 			Country:         "Germany",
-			Birthday:        usr.DateOfBirth,
+			Birthday:        birthday,
 			EntranceDate:    usr.DateOfEntry,
 			AdditionalInfos: strconv.Itoa(usr.ID), // save oldID for further transaction inserts
 			LastActivityAt:  usr.LastLogin,
@@ -51,7 +56,7 @@ func prepareUser(users []UserDeprecated) []User {
 // AddUserReq sends user creation
 func AddUserReq(users []UserDeprecated) error {
 	newUsers := prepareUser(users)
-	addUser := newUsers[143]
+	addUser := newUsers[12] //
 
 	token := viper.GetString("token")
 	apiBaseURL := viper.GetString("api_base_url")

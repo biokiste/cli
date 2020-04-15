@@ -116,9 +116,14 @@ func main() {
 		users = append(users, user)
 	}
 
-	err = AddUserReq(users)
+	err = AddUserTransaction(db, dbOld, users)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
+
+	// err = AddUserReq(users)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 }

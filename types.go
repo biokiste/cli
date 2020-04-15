@@ -33,7 +33,7 @@ type UserDeprecated struct {
 	Password      string  `json:"password,omitempty"`
 }
 
-// User hold props of new user
+// User holds props of new user
 type User struct {
 	ID              int    `json:"id"`
 	State           string `json:"state"`
@@ -56,4 +56,32 @@ type User struct {
 	UpdatedBy       int    `json:"updatedBy,omitempty"`
 	UpdateComment   string `json:"updateComment,omitempty"`
 	Password        string `json:"password"`
+}
+
+// TransactionDeprecated holds deprecated props of user transaction
+type TransactionDeprecated struct {
+	ID          int     `json:"id"`
+	Amount      float32 `json:"amount"`
+	CreatedAt   string  `json:"created_at"`
+	FirstName   string  `json:"firstname"`
+	LastName    string  `json:"lastname"`
+	Status      int     `json:"status"`
+	Reason      string  `json:"reason"`
+	CategoryID  int     `json:"category_id"`
+	Type        string  `json:"type"`
+	ValidatedBy int     `json:"validated_by"`
+}
+
+// Transaction holds props of user transaction
+type Transaction struct {
+	ID            int     `json:"id"`
+	Amount        float32 `json:"amount"`
+	Type          string  `json:"type"`
+	State         string  `json:"state"`
+	UserID        int     `json:"userId"`
+	CreatedAt     string  `json:"createdAt"`
+	CreatedBy     int     `json:"createdBy"`
+	UpdatedAt     string  `json:"updatedAt,omitempty"`
+	UpdatedBy     int     `json:"updatedBy,omitempty"`
+	UpdateComment string  `json:"updateComment,omitempty"`
 }
