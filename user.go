@@ -25,7 +25,9 @@ func prepareUser(users []UserDeprecated) []User {
 
 		var birthday string
 		if usr.DateOfBirth == "0000-00-00" {
-			birthday = "2222-12-12"
+			birthday = "2222-12-12" // fallback for invalid date
+		} else {
+			birthday = usr.DateOfBirth
 		}
 		newUser := User{
 			FirstName:       usr.Firstname,
@@ -56,7 +58,8 @@ func prepareUser(users []UserDeprecated) []User {
 // AddUserReq sends user creation
 func AddUserReq(users []UserDeprecated) error {
 	newUsers := prepareUser(users)
-	addUser := newUsers[12] //
+	addUser := newUsers[0] // 12
+	fmt.Println(addUser)
 
 	token := viper.GetString("token")
 	apiBaseURL := viper.GetString("api_base_url")
