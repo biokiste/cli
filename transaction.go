@@ -88,30 +88,35 @@ func AddUserTransaction(db *sql.DB, dbOld *sql.DB, users []UserDeprecated) error
 					UpdateComment: t.Reason,
 				}
 				fmt.Println(newTransaction)
-				reqBody, err := json.Marshal(newTransaction)
-				if err != nil {
-					print(err)
-				}
-				req, err := http.NewRequest("POST", apiBaseURL+"api/transactions", bytes.NewBuffer(reqBody))
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("Authorization", "Bearer "+token)
-				client := &http.Client{}
-				resp, err := client.Do(req)
-				if err != nil {
-					panic(err)
-				}
-				defer resp.Body.Close()
-				body, err := ioutil.ReadAll(resp.Body)
-				if err != nil {
-					panic(err)
+
+				if t.Amount != 0 {
+					reqBody, err := json.Marshal(newTransaction)
+					if err != nil {
+						print(err)
+					}
+					req, err := http.NewRequest("POST", apiBaseURL+"api/transactions", bytes.NewBuffer(reqBody))
+					req.Header.Set("Content-Type", "application/json")
+					req.Header.Set("Authorization", "Bearer "+token)
+					client := &http.Client{}
+					resp, err := client.Do(req)
+					if err != nil {
+						panic(err)
+					}
+					defer resp.Body.Close()
+					body, err := ioutil.ReadAll(resp.Body)
+					if err != nil {
+						panic(err)
+					}
+
+					if resp.StatusCode != 200 {
+						fmt.Println(resp.StatusCode, string(body))
+						return errors.New(string(resp.StatusCode))
+					}
+
+					fmt.Println("resp ", string(body))
+
 				}
 
-				if resp.StatusCode != 200 {
-					fmt.Println(resp.StatusCode, string(body))
-					return errors.New(string(resp.StatusCode))
-				}
-
-				fmt.Println("resp ", string(body))
 			}
 		}
 
