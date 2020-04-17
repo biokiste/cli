@@ -116,14 +116,23 @@ func main() {
 		users = append(users, user)
 	}
 
-	err = AddUserTransaction(db, dbOld, users)
+	// auth0Users, err := GetAllAuth0User()
+
+	// for _, usr := range auth0Users {
+	// 	err = DeleteAuth0User(usr.UserID)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// }
+
+	err = AddUserReq(users)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// err = AddUserReq(users)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err = AddUserTransaction(db, dbOld, users)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
