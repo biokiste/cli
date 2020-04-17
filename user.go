@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -19,8 +18,15 @@ func prepareUser(users []UserDeprecated) []User {
 		userMobile := strings.ReplaceAll(usr.Mobile, " ", "")
 
 		var state string
-		if usr.State == 2 {
+		switch usr.State {
+		case 2:
 			state = "active"
+		case 4:
+			state = "former"
+		case 6:
+			state = "paused"
+		default:
+			state = "nil"
 		}
 
 		var birthday string
@@ -49,7 +55,10 @@ func prepareUser(users []UserDeprecated) []User {
 			State:           state,
 		}
 
-		newUsers = append(newUsers, newUser)
+		if state != "nil" {
+			newUsers = append(newUsers, newUser)
+		}
+
 	}
 	return newUsers
 
@@ -57,36 +66,37 @@ func prepareUser(users []UserDeprecated) []User {
 
 // AddUserReq sends user creation
 func AddUserReq(users []UserDeprecated) error {
-	newUsers := prepareUser(users)
-	addUser := newUsers[0] // 12
-	fmt.Println(addUser)
-
 	token := viper.GetString("token")
 	apiBaseURL := viper.GetString("api_base_url")
+	newUsers := prepareUser(users)
 
-	reqBody, err := json.Marshal(addUser)
-	if err != nil {
-		print(err)
-	}
-	req, err := http.NewRequest("POST", apiBaseURL+"api/users", bytes.NewBuffer(reqBody))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
+	for _, addUser := range newUsers {
+		fmt.Println(addUser)
+		reqBody, err := json.Marshal(addUser)
+		if err != nil {
+			print(err)
+		}
+		req, err := http.NewRequest("POST", apiBaseURL+"api/users", bytes.NewBuffer(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token)
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			print(err)
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			print(err)
+		}
+
+		if resp.StatusCode != 200 {
+			fmt.Println(resp.StatusCode, string(body))
+			// return errors.New(string(resp.StatusCode))
+		}
+
+		fmt.Println("resp ", string(body))
 	}
 
-	if resp.StatusCode != 200 {
-		fmt.Println(resp.StatusCode, string(body))
-		return errors.New(string(resp.StatusCode))
-	}
-
-	fmt.Println("resp ", string(body))
 	return nil
 }
