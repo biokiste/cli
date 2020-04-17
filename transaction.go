@@ -78,43 +78,46 @@ func AddUserTransaction(db *sql.DB, dbOld *sql.DB, users []UserDeprecated) error
 
 		if newUserID != 0 {
 			for _, t := range transactions {
-				newTransaction := Transaction{
-					Amount:        t.Amount,
-					Type:          transactionTypes[t.CategoryID-1],
-					State:         transactionStates[t.Status-1],
-					UserID:        newUserID,
-					CreatedAt:     t.CreatedAt,
-					CreatedBy:     newUserID,
-					UpdateComment: t.Reason,
-				}
-				fmt.Println(newTransaction)
 
-				if t.Amount != 0 {
-					reqBody, err := json.Marshal(newTransaction)
-					if err != nil {
-						print(err)
+				if t.Status > 0 {
+					newTransaction := Transaction{
+						Amount:        t.Amount,
+						Type:          transactionTypes[t.CategoryID-1],
+						State:         transactionStates[t.Status-1],
+						UserID:        newUserID,
+						CreatedAt:     t.CreatedAt,
+						CreatedBy:     newUserID,
+						UpdateComment: t.Reason,
 					}
-					req, err := http.NewRequest("POST", apiBaseURL+"api/transactions", bytes.NewBuffer(reqBody))
-					req.Header.Set("Content-Type", "application/json")
-					req.Header.Set("Authorization", "Bearer "+token)
-					client := &http.Client{}
-					resp, err := client.Do(req)
-					if err != nil {
-						panic(err)
-					}
-					defer resp.Body.Close()
-					body, err := ioutil.ReadAll(resp.Body)
-					if err != nil {
-						panic(err)
-					}
+					fmt.Println(newTransaction)
 
-					if resp.StatusCode != 200 {
-						fmt.Println(resp.StatusCode, string(body))
-						return errors.New(string(resp.StatusCode))
+					if t.Amount != 0 {
+						reqBody, err := json.Marshal(newTransaction)
+						if err != nil {
+							print(err)
+						}
+						req, err := http.NewRequest("POST", apiBaseURL+"api/transactions", bytes.NewBuffer(reqBody))
+						req.Header.Set("Content-Type", "application/json")
+						req.Header.Set("Authorization", "Bearer "+token)
+						client := &http.Client{}
+						resp, err := client.Do(req)
+						if err != nil {
+							panic(err)
+						}
+						defer resp.Body.Close()
+						body, err := ioutil.ReadAll(resp.Body)
+						if err != nil {
+							panic(err)
+						}
+
+						if resp.StatusCode != 200 {
+							fmt.Println(resp.StatusCode, string(body))
+							return errors.New(string(resp.StatusCode))
+						}
+
+						fmt.Println("resp ", string(body))
+
 					}
-
-					fmt.Println("resp ", string(body))
-
 				}
 
 			}
