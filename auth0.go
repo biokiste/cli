@@ -73,6 +73,32 @@ func getToken() (string, error) {
 	return bearer.AccessToken, nil
 }
 
+// GetAllAuth0User retrieves list of all users
+func GetAllAuth0User() ([]Auth0User, error) {
+	auth0URI := viper.GetString("auth0URI")
+	apikey, err := getToken()
+	var auth0Users []Auth0User
+
+	if err != nil {
+		return auth0Users, err
+	}
+
+	req, err := http.NewRequest("GET", auth0URI+"api/v2/users", nil)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+apikey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return auth0Users, err
+	}
+
+	defer resp.Body.Close()
+	json.NewDecoder(resp.Body).Decode(&auth0Users)
+
+	return auth0Users, nil
+}
+
 // DeleteAuth0User deletes user at auth0
 func DeleteAuth0User(userID string) error {
 	auth0URI := viper.GetString("auth0URI")
@@ -93,9 +119,7 @@ func DeleteAuth0User(userID string) error {
 	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode != 204 {
-		return err
-	}
-	fmt.Println("User " + userID + " removed")
+
+	fmt.Println(userID, resp.StatusCode)
 	return nil
 }
