@@ -35,6 +35,14 @@ func prepareUser(users []UserDeprecated) []User {
 		} else {
 			birthday = usr.DateOfBirth
 		}
+
+		var leavingDate string
+		if usr.State == 4 {
+			leavingDate = usr.DateOfExit
+		} else {
+			leavingDate = ""
+		}
+
 		newUser := User{
 			FirstName:       usr.Firstname,
 			LastName:        usr.Lastname,
@@ -46,6 +54,7 @@ func prepareUser(users []UserDeprecated) []User {
 			Country:         "Germany",
 			Birthday:        birthday,
 			EntranceDate:    usr.DateOfEntry,
+			LeavingDate:     leavingDate,
 			AdditionalInfos: strconv.Itoa(usr.ID), // save oldID for further transaction inserts
 			LastActivityAt:  usr.LastLogin,
 			CreatedAt:       usr.CreatedAt,
