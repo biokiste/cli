@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -61,6 +62,11 @@ func getUserIDMapping(db *sql.DB, user UserDeprecated) int {
 		return 0
 	}
 
+	// do not migrate transactions of former users
+	if user.State == 4 {
+		return 0
+	}
+
 	return u.ID
 }
 
@@ -77,7 +83,7 @@ func AddUserTransaction(db *sql.DB, dbOld *sql.DB, users []UserDeprecated) error
 		newUserID := getUserIDMapping(db, usr)
 
 		if newUserID != 0 {
-			for _, t := range transactions {
+			for i, t := range transactions {
 
 				if t.Status > 0 {
 					newTransaction := Transaction{
@@ -89,7 +95,7 @@ func AddUserTransaction(db *sql.DB, dbOld *sql.DB, users []UserDeprecated) error
 						CreatedBy:     newUserID,
 						UpdateComment: t.Reason,
 					}
-					fmt.Println(newTransaction)
+					fmt.Fprintln(os.Stdout, "user", usr.Email, "transaction ", i, "of", len(transactions))
 
 					if t.Amount != 0 {
 						reqBody, err := json.Marshal(newTransaction)
