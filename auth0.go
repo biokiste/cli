@@ -73,8 +73,7 @@ func getToken() (string, error) {
 	return bearer.AccessToken, nil
 }
 
-// GetAllAuth0User retrieves list of all users
-func GetAllAuth0User() ([]Auth0User, error) {
+func getAllAuth0User() ([]Auth0User, error) {
 	auth0URI := viper.GetString("auth0URI")
 	apikey, err := getToken()
 	var auth0Users []Auth0User
@@ -99,8 +98,7 @@ func GetAllAuth0User() ([]Auth0User, error) {
 	return auth0Users, nil
 }
 
-// DeleteAuth0User deletes user at auth0
-func DeleteAuth0User(userID string) error {
+func deleteAuth0User(userID string) error {
 	auth0URI := viper.GetString("auth0URI")
 	apikey, err := getToken()
 
@@ -121,5 +119,18 @@ func DeleteAuth0User(userID string) error {
 	defer resp.Body.Close()
 
 	fmt.Println(userID, resp.StatusCode)
+	return nil
+}
+
+// RemoveAuthUser retrieves list of all users and deletes them
+func RemoveAuthUser() error {
+	auth0Users, err := getAllAuth0User()
+
+	for _, usr := range auth0Users {
+		err = deleteAuth0User(usr.UserID)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
