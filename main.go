@@ -126,10 +126,12 @@ func main() {
 	// 	fmt.Println(err)
 	// }
 
-	fmt.Println("start migrating transactions")
-	err = AddUserTransaction(db, dbOld, users)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// fmt.Println("start migrating transactions")
+	// err = AddUserTransaction(db, dbOld, users)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+
+	err = AddUserLoan(db, dbOld)
 
 }
