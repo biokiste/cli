@@ -72,12 +72,12 @@ func AddUserLoan(db *sql.DB, dbOld *sql.DB) error {
 	for _, usr := range users {
 		depUsr := getUserLoan(dbOld, usr)
 		loan := Loan{
-			UserID:        usr.ID,
-			State:         usr.State,
-			Amount:        depUsr.Credit,
-			CreatedAt:     depUsr.CreditDate,
-			UpdateComment: depUsr.CreditComment,
-			CreatedBy:     usr.ID,
+			UserID:    usr.ID,
+			State:     usr.State,
+			Amount:    depUsr.Credit,
+			CreatedAt: depUsr.CreditDate,
+			Comment:   depUsr.CreditComment,
+			CreatedBy: usr.ID,
 		}
 
 		if depUsr.Credit > 0 {

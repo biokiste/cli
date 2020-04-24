@@ -88,13 +88,13 @@ type Transaction struct {
 
 // Loan holds props of user loan
 type Loan struct {
-	ID            int     `json:"id"`
-	Amount        float32 `json:"amount"`
-	State         string  `json:"state"`
-	UserID        int     `json:"userId"`
-	CreatedAt     string  `json:"createdAt"`
-	CreatedBy     int     `json:"createdBy"`
-	UpdatedAt     string  `json:"updatedAt,omitempty"`
-	UpdatedBy     int     `json:"updatedBy,omitempty"`
-	UpdateComment string  `json:"updateComment,omitempty"`
+	ID        int     `json:"id"`
+	Amount    float32 `json:"amount"`
+	State     string  `json:"state"`
+	UserID    int     `json:"userId"`
+	CreatedAt string  `json:"createdAt"`
+	CreatedBy int     `json:"createdBy"`
+	UpdatedAt string  `json:"updatedAt,omitempty"`
+	UpdatedBy int     `json:"updatedBy,omitempty"`
+	Comment   string  `json:"comment,omitempty"`
 }
