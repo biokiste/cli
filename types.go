@@ -98,3 +98,28 @@ type Loan struct {
 	UpdatedBy int     `json:"updatedBy,omitempty"`
 	Comment   string  `json:"comment,omitempty"`
 }
+
+// Group defines group
+type Group struct {
+	GroupKey  string `json:"key"`
+	Email     string `json:"email"`
+	CreatedBy int    `json:"createdBy"`
+	CreatedAt string `json:"createdAt"`
+}
+
+// GroupDeprecated holds props of deprecated group table
+type GroupDeprecated struct {
+	Name string `json:"name"`
+}
+
+// UserGroupDeprecated holds props of deprecated users groups table
+type UserGroupDeprecated struct {
+	GroupID    int `json:"group_id"`
+	PositionID int `json:"position_id"`
+}
+
+// UserGroup holds props of user group relation
+type UserGroup struct {
+	GroupID  int  `json:"groupId"`
+	IsLeader bool `json:"isLeader,omitempty"`
+}
