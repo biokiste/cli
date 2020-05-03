@@ -121,17 +121,23 @@ func main() {
 	// 	fmt.Println(err)
 	// }
 
-	// err = AddUserReq(users)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	err = AddUserReq(users)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	// fmt.Println("start migrating transactions")
-	// err = AddUserTransaction(db, dbOld, users)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	fmt.Println("start migrating transactions")
+	err = AddUserTransaction(db, dbOld, users)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	err = AddUserLoan(db, dbOld)
+
+	err = CreateGroups(dbOld)
+	err = AddUserToGroups(dbOld, db)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }

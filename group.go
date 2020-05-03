@@ -4,45 +4,22 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/spf13/viper"
 )
 
-// func getUsers(db *sql.DB) []User {
-// 	results, err := db.Query(`
-// 	SELECT
-// 		ID,
-// 		COALESCE(AdditionalInfos, '') as AdditionalInfos,
-// 		State
-// 	FROM Users`)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	var users []User
-// 	for results.Next() {
-// 		var user User
-
-// 		err = results.Scan(
-// 			&user.ID,
-// 			&user.AdditionalInfos,
-// 			&user.State,
-// 		)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-// 		users = append(users, user)
-
-// 		defer results.Close()
-
-// 	}
-// 	return users
-// }
+func intToBool(i int) bool {
+	if i == 1 {
+		return true
+	}
+	return false
+}
 
 // CreateGroups creates groups
 func CreateGroups(dbOld *sql.DB) error {
@@ -106,8 +83,8 @@ func CreateGroups(dbOld *sql.DB) error {
 	return nil
 }
 
-// GetUserGroup sets user group relations
-func GetUserGroup(dbOld *sql.DB, db *sql.DB) error {
+// AddUserToGroups sets user group relations
+func AddUserToGroups(dbOld *sql.DB, db *sql.DB) error {
 	results, err := db.Query(`SELECT  ID, AdditionalInfos	FROM users`)
 	if err != nil {
 		fmt.Println(err)
@@ -153,7 +130,9 @@ func GetUserGroup(dbOld *sql.DB, db *sql.DB) error {
 				fmt.Println(err)
 
 			}
-			fmt.Println(u.ID, "=> ", uDep.GroupID, uDep.PositionID)
+
+			err = addUserToGroup(u.ID, uDep)
+
 		}
 
 	}
@@ -162,50 +141,46 @@ func GetUserGroup(dbOld *sql.DB, db *sql.DB) error {
 }
 
 // AddUserToGroup sends user loan
-// func AddUserToGroup(db *sql.DB, dbOld *sql.DB) error {
+func addUserToGroup(usrID int, uDep UserGroupDeprecated) error {
 
-// 	token := viper.GetString("token")
-// 	apiBaseURL := viper.GetString("api_base_url")
-// 	users := getUsers(db) // get users from migrated db
+	token := viper.GetString("token")
+	apiBaseURL := viper.GetString("api_base_url")
 
-// 	for _, usr := range users {
-// 		depUsr := getUserGroup(dbOld, usr)
-// 		userGroup := UserGroup{
-// 			// UserID:    usr.ID,
-// 			GroupID:  0,
-// 			IsLeader: true, // false
+	userGroup := UserGroup{
+		GroupID:  uDep.GroupID,
+		IsLeader: intToBool(uDep.PositionID),
+	}
 
-// 		}
+	reqBody, err := json.Marshal(userGroup)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-// 		if depUsr.Credit > 0 {
-// 			reqBody, err := json.Marshal(userGroup)
-// 			if err != nil {
-// 				print(err)
-// 			}
-// 			req, err := http.NewRequest("POST",
-// 				apiBaseURL+"api/users/"+string(usr.ID)+"/groups",
-// 				bytes.NewBuffer(reqBody))
-// 			req.Header.Set("Content-Type", "application/json")
-// 			req.Header.Set("Authorization", "Bearer "+token)
-// 			client := &http.Client{}
-// 			resp, err := client.Do(req)
-// 			if err != nil {
-// 				panic(err)
-// 			}
-// 			defer resp.Body.Close()
-// 			body, err := ioutil.ReadAll(resp.Body)
-// 			if err != nil {
-// 				panic(err)
-// 			}
+	userID := strconv.Itoa(usrID)
 
-// 			if resp.StatusCode != 200 {
-// 				fmt.Println(resp.StatusCode, string(body))
-// 				return errors.New(string(resp.StatusCode))
-// 			}
+	req, err := http.NewRequest("POST",
+		apiBaseURL+"api/users/"+userID+"/groups",
+		bytes.NewBuffer(reqBody))
 
-// 			fmt.Println("resp ", string(body))
-// 		}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 
-// 	}
-// 	return nil
-// }
+	if resp.StatusCode != 200 {
+		fmt.Println(resp.StatusCode, string(body))
+		return errors.New(string(resp.StatusCode))
+	}
+
+	fmt.Println("resp ", string(body))
+
+	return nil
+}

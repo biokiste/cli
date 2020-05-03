@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -101,7 +102,7 @@ func AddUserReq(users []UserDeprecated) error {
 
 		if resp.StatusCode != 200 {
 			fmt.Println(resp.StatusCode, string(body))
-			// return errors.New(string(resp.StatusCode))
+			return errors.New(string(resp.StatusCode))
 		}
 
 		fmt.Println("resp ", string(body))
