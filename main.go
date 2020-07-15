@@ -116,28 +116,34 @@ func main() {
 		users = append(users, user)
 	}
 
+	// bulk pw reset
+	err = BulkPasswordReset(users)
+	if err != nil {
+		panic(err)
+	}
+
 	// err = RemoveAuthUser()
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
 
-	err = AddUserReq(users)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// err = AddUserReq(users)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
-	fmt.Println("start migrating transactions")
-	err = AddUserTransaction(db, dbOld, users)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// fmt.Println("start migrating transactions")
+	// err = AddUserTransaction(db, dbOld, users)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
-	err = AddUserLoan(db, dbOld)
+	// err = AddUserLoan(db, dbOld)
 
-	err = CreateGroups(dbOld)
-	err = AddUserToGroups(dbOld, db)
-	if err != nil {
-		fmt.Println(err)
-	}
+	// err = CreateGroups(dbOld)
+	// err = AddUserToGroups(dbOld, db)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
 }
